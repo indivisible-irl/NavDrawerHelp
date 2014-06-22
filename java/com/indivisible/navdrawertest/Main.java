@@ -34,6 +34,12 @@ public class Main
      */
     private CharSequence mTitle;
 
+    // we need a class level references to some objects to be able to modify the
+    //   target address outside of onCreate()
+    private WebView myWebView;
+    private ActionBar actionBar;
+
+    // keep the pair of String arrays of site names and addresses
     private String[] siteNames;
     private String[] siteAddresses;
 
@@ -48,11 +54,14 @@ public class Main
         siteNames = getResources().getStringArray(R.array.site_names);
         siteAddresses = getResources().getStringArray(R.array.site_addresses);
 
+        Log.v(TAG, "names: " + siteNames.length);
+        Log.v(TAG, "addresses: " + siteAddresses.length);
+
         mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
 
-        WebView myWebView = (WebView) findViewById(R.id.main_webview);
+        myWebView = (WebView) findViewById(R.id.main_webview);
         String pageUrl = "http://www.nu.nl";
         myWebView.getSettings().setJavaScriptEnabled(true);
         myWebView.loadUrl(pageUrl);
@@ -64,20 +73,25 @@ public class Main
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position)
+    public void onNavigationDrawerItemSelected(int siteIndex)
     {
-        Log.d(TAG, "(onNavSelect) received index: " + position);
+        Log.d(TAG, "(onNavSelect) received index: " + siteIndex);
+        Log.d(TAG, "(onNavSelect) Loading page: " + siteNames[siteIndex]);
     }
 
-    public void onSectionAttached(int number)
+    public void onSectionAttached(int siteIndex)
     {
         // we can keep using the list array's indexes
-        mTitle = siteNames[number];
+
+        //Log.d(TAG, "(navigate) Address: " + siteAddresses[siteIndex]);
+        mTitle = siteNames[siteIndex];
+        actionBar.setTitle(mTitle);
+        myWebView.loadUrl(siteAddresses[siteIndex]);
     }
 
     public void restoreActionBar()
     {
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
@@ -124,7 +138,7 @@ public class Main
          * The fragment argument representing the section number for this
          * fragment.
          */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String ARG_SELECTED_SITE_INDEX = "selected_site_index";
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -134,7 +148,7 @@ public class Main
         {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, siteIndex);
+            args.putInt(ARG_SELECTED_SITE_INDEX, siteIndex);
             fragment.setArguments(args);
             return fragment;
         }
@@ -155,7 +169,8 @@ public class Main
         public void onAttach(Activity activity)
         {
             super.onAttach(activity);
-            ((Main) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+            ((Main) activity)
+                    .onSectionAttached(getArguments().getInt(ARG_SELECTED_SITE_INDEX));
         }
     }
 

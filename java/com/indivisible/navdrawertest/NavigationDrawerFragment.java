@@ -31,6 +31,7 @@ import android.widget.ListView;
  */
 public class NavigationDrawerFragment
         extends Fragment
+        implements AdapterView.OnItemClickListener
 {
 
     private String[] siteNames;
@@ -84,7 +85,8 @@ public class NavigationDrawerFragment
         }
 
         // Select either the default item (0) or the last selected item.
-        selectItem(mCurrentSelectedPosition);
+        // too early to select an item
+        //selectItem(mCurrentSelectedPosition);
     }
 
     @Override
@@ -93,6 +95,7 @@ public class NavigationDrawerFragment
         super.onActivityCreated(savedInstanceState);
         // Indicate that this fragment would like to influence the set of actions in the action bar.
         setHasOptionsMenu(true);
+        selectItem(mCurrentSelectedPosition);
     }
 
     @Override
@@ -101,21 +104,12 @@ public class NavigationDrawerFragment
                              Bundle savedInstanceState)
     {
         siteNames = getActivity().getResources().getStringArray(R.array.site_names);
+        Log.d(TAG, "number of sites loaded: " + siteNames.length);
         mDrawerListView = (ListView) inflater.inflate(R.layout.fragment_navigation_drawer,
                 container,
                 false);
-        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-            {
-
-                @Override
-                public void
-                        onItemClick(AdapterView<?> parent, View view, int position, long id)
-                {
-                    Log.i(TAG, "(Click) index: " + position);
-                    Log.i(TAG, "(Click) site: " + siteNames[position]);
-                    selectItem(position);
-                }
-            });
+        // neater to implement OnItemClickListener and define onClick() later
+        mDrawerListView.setOnItemClickListener(this);
         String[] siteNames = getActivity().getResources().getStringArray(R.array.site_names);
         mDrawerListView.setAdapter(new ArrayAdapter<String>(getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, siteNames));
@@ -213,13 +207,13 @@ public class NavigationDrawerFragment
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
-    private void selectItem(int position)
+    private void selectItem(int siteIndex)
     {
-        mCurrentSelectedPosition = position;
+        mCurrentSelectedPosition = siteIndex;
         if (mDrawerListView != null)
         {
             Log.d(TAG, "(select) list ok");
-            mDrawerListView.setItemChecked(position, true);
+            mDrawerListView.setItemChecked(siteIndex, true);
         }
         if (mDrawerLayout != null)
         {
@@ -229,7 +223,7 @@ public class NavigationDrawerFragment
         if (mCallbacks != null)
         {
             Log.d(TAG, "(select) callback...");
-            mCallbacks.onNavigationDrawerItemSelected(position);
+            mCallbacks.onNavigationDrawerItemSelected(siteIndex);
         }
     }
 
@@ -308,6 +302,14 @@ public class NavigationDrawerFragment
     private ActionBar getActionBar()
     {
         return ((ActionBarActivity) getActivity()).getSupportActionBar();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+    {
+        Log.i(TAG, "(Click) index: " + position);
+        Log.i(TAG, "(Click) site: " + siteNames[position]);
+        selectItem(position);
     }
 
     /**
