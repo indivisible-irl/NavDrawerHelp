@@ -77,16 +77,22 @@ public class Main
     {
         Log.d(TAG, "(onNavSelect) received index: " + siteIndex);
         Log.d(TAG, "(onNavSelect) Loading page: " + siteNames[siteIndex]);
+        mTitle = siteNames[siteIndex];
+        if (actionBar == null)
+        {
+            restoreActionBar();
+        }
+        else
+        {
+            actionBar.setTitle(mTitle);
+        }
+        myWebView.loadUrl(siteAddresses[siteIndex]);
     }
 
     public void onSectionAttached(int siteIndex)
     {
-        // we can keep using the list array's indexes
-
-        //Log.d(TAG, "(navigate) Address: " + siteAddresses[siteIndex]);
         mTitle = siteNames[siteIndex];
         actionBar.setTitle(mTitle);
-        myWebView.loadUrl(siteAddresses[siteIndex]);
     }
 
     public void restoreActionBar()
