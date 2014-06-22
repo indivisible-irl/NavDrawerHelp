@@ -23,28 +23,19 @@ public class Main
         implements NavigationDrawerFragment.NavigationDrawerCallbacks
 {
 
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the
-     * navigation drawer.
-     */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
-
-    /**
-     * Used to store the last screen title. For use in
-     * {@link #restoreActionBar()}.
-     */
-    private CharSequence mTitle;
-
     // we need a class level references to some objects to be able to modify the
     //   target address outside of onCreate()
     private WebView myWebView;
     private ActionBar actionBar;
     private ProgressDialog progressDialog;
+    private NavigationDrawerFragment mNavigationDrawerFragment;
 
     // keep the pair of String arrays of site names and addresses
     private String[] siteNames;
     private String[] siteAddresses;
+    private CharSequence mTitle;
 
+    // it's nice to keep a TAG String in every class around for consistent Log printing
     private static final String TAG = "MainActivity";
 
     @Override
@@ -95,12 +86,19 @@ public class Main
         loadWebPage(siteIndex);
     }
 
-    public void restoreActionBar()
+    public void initActionBar()
     {
         actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
+    }
+
+    private void initProgressDialog()
+    {
+        progressDialog = new ProgressDialog(this, ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage(getString(R.string.page_load_progress_message));
     }
 
     private void loadWebPage(int siteIndex)
@@ -118,7 +116,7 @@ public class Main
         mTitle = siteNames[siteIndex];
         if (actionBar == null)
         {
-            restoreActionBar();
+            initActionBar();
         }
         else
         {
@@ -127,13 +125,6 @@ public class Main
         myWebView.loadUrl(siteAddresses[siteIndex]);
 
         // progressDialog gets dismissed above in WebViewclient declaration
-    }
-
-    private void initProgressDialog()
-    {
-        progressDialog = new ProgressDialog(this, ProgressDialog.STYLE_SPINNER);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage(getString(R.string.page_load_progress_message));
     }
 
 
@@ -146,7 +137,7 @@ public class Main
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.global, menu);
-            restoreActionBar();
+            initActionBar();
             return true;
         }
         return super.onCreateOptionsMenu(menu);
