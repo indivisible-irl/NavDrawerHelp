@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +33,7 @@ public class NavigationDrawerFragment
         extends Fragment
 {
 
+    private static final String TAG = "NavDrawerFrag";
     /**
      * Remember the position of the selected item.
      */
@@ -107,6 +109,7 @@ public class NavigationDrawerFragment
                 public void
                         onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
+                    Log.i(TAG, "(Click) index: " + position);
                     selectItem(position);
                 }
             });
@@ -216,14 +219,17 @@ public class NavigationDrawerFragment
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null)
         {
+            Log.d(TAG, "(select) list ok");
             mDrawerListView.setItemChecked(position, true);
         }
         if (mDrawerLayout != null)
         {
+            Log.d(TAG, "(select) drawer ok");
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null)
         {
+            Log.d(TAG, "(select) callback...");
             mCallbacks.onNavigationDrawerItemSelected(position);
         }
     }
@@ -284,8 +290,6 @@ public class NavigationDrawerFragment
         {
             //fragment = new PlanetFragment();
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 
