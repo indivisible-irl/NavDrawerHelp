@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,11 +34,19 @@ public class Main
      */
     private CharSequence mTitle;
 
+    private String[] siteNames;
+    private String[] siteAddresses;
+
+    private static final String TAG = "MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        siteNames = getResources().getStringArray(R.array.site_names);
+        siteAddresses = getResources().getStringArray(R.array.site_addresses);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.navigation_drawer);
@@ -57,26 +66,13 @@ public class Main
     @Override
     public void onNavigationDrawerItemSelected(int position)
     {
-        // change the url based on the clicked item
+        Log.d(TAG, "(onNavSelect) received index: " + position);
     }
 
     public void onSectionAttached(int number)
     {
-        switch (number)
-        {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-            case 4:
-                mTitle = getString(R.string.title_section4);
-                break;
-        }
+        // we can keep using the list array's indexes
+        mTitle = siteNames[number];
     }
 
     public void restoreActionBar()
@@ -134,11 +130,11 @@ public class Main
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber)
+        public static PlaceholderFragment newInstance(int siteIndex)
         {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            args.putInt(ARG_SECTION_NUMBER, siteIndex);
             fragment.setArguments(args);
             return fragment;
         }

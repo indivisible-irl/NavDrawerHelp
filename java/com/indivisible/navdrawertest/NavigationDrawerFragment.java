@@ -33,6 +33,7 @@ public class NavigationDrawerFragment
         extends Fragment
 {
 
+    private String[] siteNames;
     private static final String TAG = "NavDrawerFrag";
     /**
      * Remember the position of the selected item.
@@ -99,6 +100,7 @@ public class NavigationDrawerFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
+        siteNames = getActivity().getResources().getStringArray(R.array.site_names);
         mDrawerListView = (ListView) inflater.inflate(R.layout.fragment_navigation_drawer,
                 container,
                 false);
@@ -110,16 +112,13 @@ public class NavigationDrawerFragment
                         onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
                     Log.i(TAG, "(Click) index: " + position);
+                    Log.i(TAG, "(Click) site: " + siteNames[position]);
                     selectItem(position);
                 }
             });
+        String[] siteNames = getActivity().getResources().getStringArray(R.array.site_names);
         mDrawerListView.setAdapter(new ArrayAdapter<String>(getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, new String[] {
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
-                        getString(R.string.title_section4),
-                }));
+                android.R.layout.simple_list_item_1, android.R.id.text1, siteNames));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
