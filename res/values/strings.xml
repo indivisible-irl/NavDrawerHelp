@@ -9,5 +9,6 @@
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
     <string name="test1">Testing this part</string>
+    <string name="page_load_progress_message">Loading page...</string>
 
 </resources>

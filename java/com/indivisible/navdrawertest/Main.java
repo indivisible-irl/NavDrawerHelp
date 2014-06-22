@@ -2,6 +2,7 @@ package com.indivisible.navdrawertest;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -38,6 +39,7 @@ public class Main
     //   target address outside of onCreate()
     private WebView myWebView;
     private ActionBar actionBar;
+    private ProgressDialog progressDialog;
 
     // keep the pair of String arrays of site names and addresses
     private String[] siteNames;
@@ -51,23 +53,30 @@ public class Main
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // grab the needed website arrays
         siteNames = getResources().getStringArray(R.array.site_names);
         siteAddresses = getResources().getStringArray(R.array.site_addresses);
 
-        Log.v(TAG, "names: " + siteNames.length);
-        Log.v(TAG, "addresses: " + siteAddresses.length);
-
-        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-
+        // set up WebView. initial page load comes from NavDrawerFragment attach
         myWebView = (WebView) findViewById(R.id.main_webview);
-        String pageUrl = "http://www.nu.nl";
         myWebView.getSettings().setJavaScriptEnabled(true);
-        myWebView.loadUrl(pageUrl);
-        myWebView.setWebViewClient(new WebViewClient());
+        myWebView.setWebViewClient(new WebViewClient()
+            {
+
+                @Override
+                public void onPageFinished(WebView view, String url)
+                {
+                    // when a page has finished loading dismiss any progress dialog
+                    if (progressDialog != null && progressDialog.isShowing())
+                    {
+                        progressDialog.dismiss();
+                    }
+                }
+            });
 
         // Set up the drawer.
+        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.navigation_drawer);
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
     }
@@ -75,8 +84,37 @@ public class Main
     @Override
     public void onNavigationDrawerItemSelected(int siteIndex)
     {
+        // user selected page load
         Log.d(TAG, "(onNavSelect) received index: " + siteIndex);
-        Log.d(TAG, "(onNavSelect) Loading page: " + siteNames[siteIndex]);
+        loadWebPage(siteIndex);
+    }
+
+    public void onSectionAttached(int siteIndex)
+    {
+        // initial page load. not user selected.
+        loadWebPage(siteIndex);
+    }
+
+    public void restoreActionBar()
+    {
+        actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mTitle);
+    }
+
+    private void loadWebPage(int siteIndex)
+    {
+        // lets show a progress indicator instead of a blank screen
+        if (progressDialog == null)
+        {
+            initProgressDialog();
+        }
+        progressDialog.show();
+
+        // load the page
+        Log.d(TAG, "(loadWebPage) Loading page: " + siteNames[siteIndex] + "("
+                + siteAddresses[siteIndex] + ")");
         mTitle = siteNames[siteIndex];
         if (actionBar == null)
         {
@@ -87,20 +125,15 @@ public class Main
             actionBar.setTitle(mTitle);
         }
         myWebView.loadUrl(siteAddresses[siteIndex]);
+
+        // progressDialog gets dismissed above in WebViewclient declaration
     }
 
-    public void onSectionAttached(int siteIndex)
+    private void initProgressDialog()
     {
-        mTitle = siteNames[siteIndex];
-        actionBar.setTitle(mTitle);
-    }
-
-    public void restoreActionBar()
-    {
-        actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+        progressDialog = new ProgressDialog(this, ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage(getString(R.string.page_load_progress_message));
     }
 
 
@@ -175,6 +208,8 @@ public class Main
         public void onAttach(Activity activity)
         {
             super.onAttach(activity);
+            // Here is where you can define the default page you want loaded
+            //  or if you want to save/restore the last page viewed etc.
             ((Main) activity)
                     .onSectionAttached(getArguments().getInt(ARG_SELECTED_SITE_INDEX));
         }

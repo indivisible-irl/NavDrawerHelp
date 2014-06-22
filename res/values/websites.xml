@@ -3,12 +3,14 @@
     <!-- make sure to keep the names and addresses are in the same
          order so that the indexes match up for use in code -->
     <string-array name="site_names">
+        <item>NU.nl</item>
         <item>Google</item>
         <item>Stack Overflow</item>
         <item>Facebook</item>
         <item>Twitter</item>
     </string-array>
     <string-array name="site_addresses">
+        <item>http://www.nu.nl</item>
         <item>http://www.google.com</item>
         <item>http://www.stackoverflow.com</item>
         <item>http://www.facebook.com</item>
