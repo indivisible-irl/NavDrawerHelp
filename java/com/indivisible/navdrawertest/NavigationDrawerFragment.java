@@ -19,7 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 
 /**
@@ -41,6 +43,8 @@ public class NavigationDrawerFragment
 
     private View mFragmentContainerView;
     private ListView mDrawerListView;
+    private ImageView mDrawerImage;
+    private TextView mDrawerText;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private NavigationDrawerCallbacks mCallbacks;
@@ -79,19 +83,27 @@ public class NavigationDrawerFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
+        // need site names for list
         siteNames = getActivity().getResources().getStringArray(R.array.site_names);
         Log.d(TAG, "number of sites loaded: " + siteNames.length);
-        mDrawerListView = (ListView) inflater.inflate(R.layout.fragment_navigation_drawer,
-                container,
-                false);
-        // neater to 'implement OnItemClickListener' and define onClick() later
-        mDrawerListView.setOnItemClickListener(this);
-        String[] siteNames = getActivity().getResources().getStringArray(R.array.site_names);
 
+        // inflate the parent view (the entire layout)
+        View view = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        // now grab the separate child views from inside it
+        mDrawerListView = (ListView) view.findViewById(R.id.nav_listView);
+        mDrawerImage = (ImageView) view.findViewById(R.id.nav_image);
+        mDrawerText = (TextView) view.findViewById(R.id.nav_text);
+
+        // configure the Views
+        mDrawerText.setText("Give it a name/title");
+        //mDrawerImage.setImageURI(...);    // set your ImageView however you want, I just gave it one in XML
+        mDrawerListView.setOnItemClickListener(this);
         mDrawerListView.setAdapter(new ArrayAdapter<String>(getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, siteNames));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-        return mDrawerListView;
+
+        // and return the inflated view up the stack
+        return view;
     }
 
     public boolean isDrawerOpen()
